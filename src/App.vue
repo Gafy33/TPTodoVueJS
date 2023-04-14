@@ -17,6 +17,7 @@ const nombreCheckTodo = ref(0);
 const nombreTodoEnCours = ref(0);
 const nombreTodoFini = ref(0);
 const updateTodos = ref(0);
+const searchName = ref("");
 
 const nameTache = ref("");
 const namePeople = ref("");
@@ -275,55 +276,65 @@ const allDeleteTodohandle = () => {
       </div>
     </div>
     <div class="relative flex flex-col w-full bg-neutral-900 px-36 mt-5 gap-1">
+      <div class="w-full p-2 flex flex-row px-40">
+        <input
+          type="text"
+          v-model="searchName"
+          placeholder="Rechercher par nom de la tache, heure ou responsable"
+          class="w-full border border-white/25 p-2 outline-none bg-transparent text-white"
+        />
+      </div>
       <template v-for="(todo, index) in todos" :key="todo.nameTache">
-        <div
-          class="w-full relative flex flex-row gap-4 p-2 border border-white/25 justify-between text-white items-center cursor-pointer"
-          :class="[
-            todo.check ? 'bg-violet-500' : '',
-            todo.etat === 'en cours'
-              ? 'border-blue-500'
-              : todo.etat === 'fini'
-              ? 'border-green-500'
-              : '',
-          ]"
-          @click="checkTodoHandle(index)"
-        >
-          <div class="flex flex-row">
-            <indexComponent :index="index" />
-            <NomTacheComponent :name="todo.nameTache" />
-            <NombreHeureComponent :heure="todo.nombreHeure" />
-            <NomPeopleComponent :name="todo.namePeople" />
+        <template v-if="!searchName || searchName && (todo.nameTache.includes(searchName) || todo.nombreHeure.toString().includes(searchName) || todo.namePeople.includes(searchName))">
+          <div
+            class="w-full relative flex flex-row gap-4 p-2 border border-white/25 justify-between text-white items-center cursor-pointer"
+            :class="[
+              todo.check ? 'bg-violet-500' : '',
+              todo.etat === 'en cours'
+                ? 'border-blue-500'
+                : todo.etat === 'fini'
+                ? 'border-green-500'
+                : '',
+            ]"
+            @click="checkTodoHandle(index)"
+          >
+            <div class="flex flex-row">
+              <indexComponent :index="index" />
+              <NomTacheComponent :name="todo.nameTache" />
+              <NombreHeureComponent :heure="todo.nombreHeure" />
+              <NomPeopleComponent :name="todo.namePeople" />
+            </div>
+            <div class="flex flex-row gap-4">
+              <button
+                v-if="todo.etat !== 'fini' && todo.etat !== 'en cours'"
+                class="p-2 bg-blue-500 hover:bg-blue-700 text-xs w-24"
+                @click.stop="etatUpdateTodoHandle(index, 'en cours')"
+              >
+                En cours
+              </button>
+              <button
+                v-if="todo.etat !== 'fini'"
+                class="p-2 bg-green-500 hover:bg-green-700 text-xs w-24"
+                @click.stop="etatUpdateTodoHandle(index, 'fini')"
+              >
+                Fini
+              </button>
+              <button
+                v-if="todo.etat !== 'fini'"
+                class="p-2 bg-orange-500 hover:bg-orange-700 text-xs w-24"
+                @click.stop="editerTodoHandle(index)"
+              >
+                Editer
+              </button>
+              <button
+                class="p-2 bg-red-500 hover:bg-red-700 text-xs w-24"
+                @click.stop="supprimerTodoHandle(index)"
+              >
+                Supprimer
+              </button>
+            </div>
           </div>
-          <div class="flex flex-row gap-4">
-            <button
-              v-if="todo.etat !== 'fini' && todo.etat !== 'en cours'"
-              class="p-2 bg-blue-500 hover:bg-blue-700 text-xs w-24"
-              @click.stop="etatUpdateTodoHandle(index, 'en cours')"
-            >
-              En cours
-            </button>
-            <button
-              v-if="todo.etat !== 'fini'"
-              class="p-2 bg-green-500 hover:bg-green-700 text-xs w-24"
-              @click.stop="etatUpdateTodoHandle(index, 'fini')"
-            >
-              Fini
-            </button>
-            <button
-              v-if="todo.etat !== 'fini'"
-              class="p-2 bg-orange-500 hover:bg-orange-700 text-xs w-24"
-              @click.stop="editerTodoHandle(index)"
-            >
-              Editer
-            </button>
-            <button
-              class="p-2 bg-red-500 hover:bg-red-700 text-xs w-24"
-              @click.stop="supprimerTodoHandle(index)"
-            >
-              Supprimer
-            </button>
-          </div>
-        </div>
+        </template>
       </template>
     </div>
   </div>
